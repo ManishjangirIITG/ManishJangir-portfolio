@@ -8,6 +8,13 @@ on:
 jobs:
   quality:
     runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_NAME: Manish Jangir Portfolio
+      DATABASE_URL: postgresql://test:test@localhost:5432/test
+
     steps:
       - uses: actions/checkout@v4
 
