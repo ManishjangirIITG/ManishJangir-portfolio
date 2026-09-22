@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { ProjectCard } from "@/components/public/project-card";
+import { EngineeringSystemMap } from "@/components/system/engineering-system-map";
+import { InspectSystem } from "@/components/system/inspect-system";
+import { getPublicSystemInfo } from "@/lib/system/info";
 import {
   getFeaturedProjects,
   getPublishedExperiences,
@@ -12,6 +15,7 @@ export default async function HomePage() {
     getPublishedExperiences(),
     getPublishedUpdates(3),
   ]);
+  const system = getPublicSystemInfo();
   return (
     <div>
       <section className="mx-auto grid max-w-6xl gap-12 px-5 py-20 sm:px-6 sm:py-28 lg:grid-cols-[1fr_360px] lg:items-end lg:px-8">
@@ -44,7 +48,10 @@ export default async function HomePage() {
           </div>
         </div>
         <aside className="border border-[var(--border)] bg-[var(--surface)] p-5">
-          <p className="font-mono text-xs text-[var(--primary)]">SYSTEM / CONTENT</p>
+          <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
+            <p className="font-mono text-xs text-[var(--muted)]">SYSTEM</p>
+            <p className="font-mono text-xs text-[var(--primary)]">v{system.version}</p>
+          </div>
           <dl className="mt-5 space-y-4 font-mono text-xs">
             <div className="flex justify-between">
               <dt className="text-[var(--subtle)]">published projects</dt>
@@ -58,30 +65,20 @@ export default async function HomePage() {
               <dt className="text-[var(--subtle)]">published updates</dt>
               <dd>{updates.length}</dd>
             </div>
+            <div className="flex justify-between">
+              <dt className="text-[var(--subtle)]">revision</dt>
+              <dd>{system.gitSha ?? "local"}</dd>
+            </div>
           </dl>
-          <p className="mt-5 border-t border-[var(--border)] pt-4 text-xs leading-5 text-[var(--subtle)]">
-            Live counts from the portfolio content database. Deeper system telemetry arrives in the
-            observability phase.
-          </p>
+          <a
+            href="#inspect-system"
+            className="mt-5 block border-t border-[var(--border)] pt-4 font-mono text-xs text-[var(--primary)]"
+          >
+            Inspect runtime ↓
+          </a>
         </aside>
       </section>
-      <section className="border-y border-[var(--border)]">
-        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--primary)]">
-            Engineering path
-          </p>
-          <div className="mt-6 grid gap-px bg-[var(--border)] md:grid-cols-4">
-            {["Chemical science", "Graph ML", "Backend systems", "Production infrastructure"].map(
-              (x, i) => (
-                <div key={x} className="bg-[var(--background)] p-5">
-                  <span className="font-mono text-xs text-[var(--subtle)]">0{i + 1}</span>
-                  <p className="mt-2 font-medium">{x}</p>
-                </div>
-              ),
-            )}
-          </div>
-        </div>
-      </section>
+      <EngineeringSystemMap />
       <section className="mx-auto max-w-6xl px-5 py-20 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between gap-6">
           <div>
@@ -102,6 +99,9 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+      <div id="inspect-system">
+        <InspectSystem {...system} />
+      </div>
       <section className="border-y border-[var(--border)] bg-[var(--surface)]">
         <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--primary)]">
