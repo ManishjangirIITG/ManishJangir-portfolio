@@ -6,8 +6,12 @@ export const siteConfig = {
     { label: "About", href: "/about" },
     { label: "Experience", href: "/experience" },
     { label: "Projects", href: "/projects" },
-    { label: "Resume", href: "/resume" },
+    { label: "Profile", href: "/resume" },
     { label: "Updates", href: "/updates" },
     { label: "Contact", href: "/contact" },
   ],
+  links: {
+    linkedin: "https://www.linkedin.com/in/jangirmanish",
+    github: "https://github.com/ManishjangirIITG",
+  },
 } as const;
