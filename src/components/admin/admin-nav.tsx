@@ -5,6 +5,7 @@ const adminNavigation = [
   { href: "/admin/projects", label: "Projects" },
   { href: "/admin/experience", label: "Experience" },
   { href: "/admin/updates", label: "Updates" },
+  { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/audit", label: "Audit log" },
 ] as const;
 

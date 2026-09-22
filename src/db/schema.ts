@@ -217,6 +217,32 @@ export const adminSessionsRelations = relations(adminSessions, ({ one }) => ({
   }),
 }));
 
+export const analyticsEventType = pgEnum("analytics_event_type", [
+  "page_view",
+  "project_view",
+  "resume_download",
+]);
+
+export const analyticsEvents = pgTable(
+  "analytics_events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    eventType: analyticsEventType("event_type").notNull(),
+    path: text("path").notNull(),
+    projectSlug: text("project_slug"),
+    occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("analytics_events_occurred_at_idx").on(table.occurredAt),
+    index("analytics_events_event_type_occurred_at_idx").on(table.eventType, table.occurredAt),
+    index("analytics_events_project_slug_idx").on(table.projectSlug),
+    check(
+      "analytics_events_project_slug_check",
+      sql`(${table.eventType} = 'project_view' AND ${table.projectSlug} IS NOT NULL) OR (${table.eventType} <> 'project_view' AND ${table.projectSlug} IS NULL)`,
+    ),
+  ],
+);
+
 export const auditAction = pgEnum("audit_action", [
   "create",
   "update",

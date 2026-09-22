@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { PageViewTracker } from "@/components/analytics/page-view-tracker";
+
 import { SiteShell } from "@/components/layout/site-shell";
 import "./globals.css";
 
@@ -20,6 +22,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
+        <PageViewTracker />
         <SiteShell>{children}</SiteShell>
       </body>
     </html>
