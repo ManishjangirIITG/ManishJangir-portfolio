@@ -34,17 +34,41 @@ for (const route of publicRoutes) {
 }
 
 test("public navigation does not emit browser errors", async ({ page }) => {
-  const errors: string[] = [];
+  const consoleErrors: string[] = [];
+  const failedResponses: string[] = [];
+
   page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
+    if (message.type() === "error") {
+      consoleErrors.push(message.text());
+    }
   });
-  page.on("pageerror", (error) => errors.push(error.message));
+
+  page.on("pageerror", (error) => {
+    consoleErrors.push(error.message);
+  });
+
+  page.on("response", (response) => {
+    if (response.status() >= 400) {
+      failedResponses.push(`${response.status()} ${response.request().method()} ${response.url()}`);
+    }
+  });
 
   await page.goto("/");
-  await page.getByRole("link", { name: "View work" }).click();
+
+  const projectsLink = page.getByRole("link", {
+    name: "View work",
+    exact: true,
+  });
+
+  await expect(projectsLink).toBeVisible();
+  await expect(projectsLink).toHaveAttribute("href", "/projects");
+
+  await page.goto("/projects");
+
   await expect(page).toHaveURL(/\/projects$/);
 
-  expect(errors).toEqual([]);
+  expect(failedResponses).toEqual([]);
+  expect(consoleErrors).toEqual([]);
 });
 
 test("unknown public routes use the application 404", async ({ page }) => {

@@ -28,15 +28,36 @@ test("readiness endpoint verifies PostgreSQL", async ({ request }) => {
   expect(body.durationMs).toEqual(expect.any(Number));
 });
 
-test("analytics rejects malformed and cross-origin events", async ({ request }) => {
+test("analytics rejects malformed and cross-origin events", async ({ request }, testInfo) => {
+  const baseURL = testInfo.project.use.baseURL;
+
+  if (typeof baseURL !== "string") {
+    throw new Error("Playwright baseURL is required for analytics tests");
+  }
+
+  const origin = new URL(baseURL).origin;
+
+  const missingOrigin = await request.post("/api/analytics/events", {
+    data: { name: "page_view", path: "/" },
+  });
+
+  expect(missingOrigin.status()).toBe(403);
+
   const malformed = await request.post("/api/analytics/events", {
+    headers: {
+      Origin: origin,
+    },
     data: { name: "made_up_event", path: "/" },
   });
+
   expect(malformed.status()).toBe(400);
 
   const crossOrigin = await request.post("/api/analytics/events", {
-    headers: { Origin: "https://example.invalid" },
+    headers: {
+      Origin: "https://example.invalid",
+    },
     data: { name: "page_view", path: "/" },
   });
+
   expect(crossOrigin.status()).toBe(403);
 });
