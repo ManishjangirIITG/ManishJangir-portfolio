@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useReportWebVitals } from "next/web-vitals";
+import type { PublicEnvironment } from "@/lib/system/info";
 
 type CheckState = "checking" | "ok" | "unavailable";
 type VitalName = "CLS" | "FCP" | "INP" | "LCP" | "TTFB";
@@ -11,7 +12,7 @@ type VitalSnapshot = Partial<Record<VitalName, number>>;
 interface InspectSystemProps {
   version: string;
   gitSha: string | null;
-  environment: "development" | "test" | "production";
+  environment: PublicEnvironment;
 }
 
 const vitalNames = new Set<VitalName>(["CLS", "FCP", "INP", "LCP", "TTFB"]);

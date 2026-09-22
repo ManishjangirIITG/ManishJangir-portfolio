@@ -27,15 +27,7 @@ baseUrl.hash = "";
 
 const REQUEST_TIMEOUT_MS = 10_000;
 
-const publicRoutes = [
-  "/",
-  "/about",
-  "/experience",
-  "/projects",
-  "/resume",
-  "/updates",
-  "/contact",
-];
+const publicRoutes = ["/", "/about", "/experience", "/projects", "/resume", "/updates", "/contact"];
 
 function urlFor(pathname) {
   return new URL(pathname, baseUrl).toString();

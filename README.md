@@ -65,17 +65,17 @@ The application intentionally avoids fake traffic, uptime, user counts, benchmar
 
 ## Public routes
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Main portfolio and system overview |
-| `/about` | Engineering background and trajectory |
-| `/experience` | Professional experience |
-| `/projects` | Published project case studies |
-| `/projects/[slug]` | Project deep dives |
-| `/resume` | Sanitized public professional profile |
-| `/updates` | Published build/project updates |
-| `/updates/[slug]` | Individual update |
-| `/contact` | Public professional contact channels |
+| Route              | Purpose                               |
+| ------------------ | ------------------------------------- |
+| `/`                | Main portfolio and system overview    |
+| `/about`           | Engineering background and trajectory |
+| `/experience`      | Professional experience               |
+| `/projects`        | Published project case studies        |
+| `/projects/[slug]` | Project deep dives                    |
+| `/resume`          | Sanitized public professional profile |
+| `/updates`         | Published build/project updates       |
+| `/updates/[slug]`  | Individual update                     |
+| `/contact`         | Public professional contact channels  |
 
 The public site does **not** expose a downloadable private resume, personal phone number, or private email address.
 
