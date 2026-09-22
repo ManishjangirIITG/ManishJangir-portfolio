@@ -81,5 +81,8 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: download playwright
+        run: npx playwright install
+
       - name: End-to-end tests
         run: npm run test:e2e
