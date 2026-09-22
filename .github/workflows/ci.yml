@@ -48,11 +48,22 @@ jobs:
       - name: Provision CI admin
         shell: bash
         run: |
+          set -euo pipefail
+
           CI_PASSWORD="$(openssl rand -hex 24)"
           HASH="$(node scripts/create-admin-hash.mjs "$CI_PASSWORD" | sed 's/^ADMIN_PASSWORD_HASH=//')"
-          echo "ADMIN_EMAIL=$CI_ADMIN_EMAIL" >> "$GITHUB_ENV"
-          echo "CI_ADMIN_PASSWORD=$CI_PASSWORD" >> "$GITHUB_ENV"
-          echo "ADMIN_PASSWORD_HASH=$HASH" >> "$GITHUB_ENV"
+
+          echo "::add-mask::$CI_PASSWORD"
+          echo "::add-mask::$HASH"
+
+          export ADMIN_EMAIL="$CI_ADMIN_EMAIL"
+          export CI_ADMIN_PASSWORD="$CI_PASSWORD"
+          export ADMIN_PASSWORD_HASH="$HASH"
+
+          echo "ADMIN_EMAIL=$ADMIN_EMAIL" >> "$GITHUB_ENV"
+          echo "CI_ADMIN_PASSWORD=$CI_ADMIN_PASSWORD" >> "$GITHUB_ENV"
+          echo "ADMIN_PASSWORD_HASH=$ADMIN_PASSWORD_HASH" >> "$GITHUB_ENV"
+
           npm run admin:seed
 
       - name: Typecheck
