@@ -1,8 +1,11 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   date,
   integer,
+  index,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -40,7 +43,10 @@ export const projects = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [uniqueIndex("projects_slug_unique").on(table.slug)],
+  (table) => [
+    uniqueIndex("projects_slug_unique").on(table.slug),
+    index("projects_sort_order_idx").on(table.sortOrder),
+  ],
 );
 
 export const projectSections = pgTable(
@@ -101,11 +107,22 @@ export const experiences = pgTable(
     status: contentStatus("status").notNull().default("draft"),
     startDate: date("start_date").notNull(),
     endDate: date("end_date"),
+    isCurrent: boolean("is_current").notNull().default(false),
     sortOrder: integer("sort_order").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [uniqueIndex("experiences_sort_order_unique").on(table.sortOrder)],
+  (table) => [
+    index("experiences_sort_order_idx").on(table.sortOrder),
+    check(
+      "experiences_current_end_date_check",
+      sql`(${table.isCurrent} = true AND ${table.endDate} IS NULL) OR (${table.isCurrent} = false AND ${table.endDate} IS NOT NULL)`,
+    ),
+    check(
+      "experiences_end_date_after_start_date_check",
+      sql`${table.endDate} IS NULL OR ${table.endDate} >= ${table.startDate}`,
+    ),
+  ],
 );
 
 export const updates = pgTable(
@@ -193,3 +210,52 @@ export const adminSessionsRelations = relations(adminSessions, ({ one }) => ({
     references: [adminUsers.id],
   }),
 }));
+
+export const auditAction = pgEnum("audit_action", [
+  "create",
+  "update",
+  "delete",
+  "publish",
+  "archive",
+]);
+export const contentEntityType = pgEnum("content_entity_type", ["project", "experience", "update"]);
+
+export const contentRevisions = pgTable(
+  "content_revisions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    entityType: contentEntityType("entity_type").notNull(),
+    entityId: uuid("entity_id").notNull(),
+    revisionNumber: integer("revision_number").notNull(),
+    snapshot: jsonb("snapshot").notNull(),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("content_revisions_entity_revision_unique").on(
+      table.entityType,
+      table.entityId,
+      table.revisionNumber,
+    ),
+    index("content_revisions_entity_idx").on(table.entityType, table.entityId, table.createdAt),
+  ],
+);
+
+export const auditLogs = pgTable(
+  "audit_logs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    actorId: uuid("actor_id").references(() => adminUsers.id, { onDelete: "set null" }),
+    action: auditAction("action").notNull(),
+    entityType: contentEntityType("entity_type").notNull(),
+    entityId: uuid("entity_id").notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("audit_logs_entity_idx").on(table.entityType, table.entityId, table.createdAt),
+    index("audit_logs_actor_idx").on(table.actorId, table.createdAt),
+  ],
+);

@@ -1,49 +1,38 @@
+import { count } from "drizzle-orm";
 import { redirect } from "next/navigation";
-
+import { db } from "@/db";
+import { experiences, projects, updates } from "@/db/schema";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { destroyAdminSession, requireAdminSession } from "@/lib/auth/session";
-
 async function signOut() {
   "use server";
   await destroyAdminSession();
   redirect("/admin/login");
 }
-
 export default async function AdminPage() {
   const admin = await requireAdminSession();
-
+  const [[p], [e], [u]] = await Promise.all([
+    db.select({ value: count() }).from(projects),
+    db.select({ value: count() }).from(experiences),
+    db.select({ value: count() }).from(updates),
+  ]);
   return (
-    <main className="mx-auto w-full max-w-5xl px-6 py-16">
-      <div className="flex flex-col gap-4 border-b border-white/10 pb-8 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm text-[var(--color-primary)]">Admin</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">Portfolio administration</h1>
-          <p className="mt-2 text-sm text-[var(--color-muted)]">
-            Signed in as {admin.email}. Content management will be added in the next CMS phase.
-          </p>
-        </div>
-
-        <form action={signOut}>
-          <button
-            className="rounded-lg border border-white/10 px-4 py-2 text-sm text-[var(--color-muted)] hover:border-white/20 hover:text-white"
-            type="submit"
-          >
-            Sign out
-          </button>
-        </form>
-      </div>
-
-      <section className="mt-10 grid gap-4 md:grid-cols-3">
+    <AdminShell title="Portfolio administration" description={`Signed in as ${admin.email}.`}>
+      <section className="grid gap-4 md:grid-cols-3">
         {[
-          ["Authentication", "Active"],
-          ["Content model", "Ready"],
-          ["CRUD", "Phase 4"],
-        ].map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-            <p className="text-sm text-[var(--color-muted)]">{label}</p>
-            <p className="mt-2 font-medium">{value}</p>
+          ["Projects", p?.value ?? 0],
+          ["Experience", e?.value ?? 0],
+          ["Updates", u?.value ?? 0],
+        ].map(([l, v]) => (
+          <div key={l} className="rounded-xl border border-white/10 p-5">
+            <p className="text-sm text-[var(--color-muted)]">{l}</p>
+            <p className="mt-2 text-2xl font-semibold">{v}</p>
           </div>
         ))}
       </section>
-    </main>
+      <form action={signOut} className="mt-8">
+        <button className="rounded-lg border border-white/10 px-4 py-2 text-sm">Sign out</button>
+      </form>
+    </AdminShell>
   );
 }
