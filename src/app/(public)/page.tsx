@@ -3,6 +3,7 @@ import { ProjectCard } from "@/components/public/project-card";
 import { EngineeringSystemMap } from "@/components/system/engineering-system-map";
 import { InspectSystem } from "@/components/system/inspect-system";
 import { getPublicSystemInfo } from "@/lib/system/info";
+import { getPublishedContentCounts } from "@/lib/public/stats";
 import {
   getFeaturedProjects,
   getPublishedExperiences,
@@ -10,10 +11,11 @@ import {
 } from "@/lib/public/content";
 import { formatDateRange } from "@/lib/public/format";
 export default async function HomePage() {
-  const [projects, experience, updates] = await Promise.all([
+  const [featuredProjects, experience, recentUpdates, publishedCounts] = await Promise.all([
     getFeaturedProjects(3),
     getPublishedExperiences(),
     getPublishedUpdates(3),
+    getPublishedContentCounts(),
   ]);
   const system = getPublicSystemInfo();
   return (
@@ -55,15 +57,15 @@ export default async function HomePage() {
           <dl className="mt-5 space-y-4 font-mono text-xs">
             <div className="flex justify-between">
               <dt className="text-[var(--subtle)]">published projects</dt>
-              <dd>{projects.length}</dd>
+              <dd>{publishedCounts.projects}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-[var(--subtle)]">experience entries</dt>
-              <dd>{experience.length}</dd>
+              <dd>{publishedCounts.experiences}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-[var(--subtle)]">published updates</dt>
-              <dd>{updates.length}</dd>
+              <dd>{publishedCounts.updates}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-[var(--subtle)]">revision</dt>
@@ -94,7 +96,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="mt-8 grid gap-5 lg:grid-cols-2">
-          {projects.map((p) => (
+          {featuredProjects.map((p) => (
             <ProjectCard key={p.id} project={p} />
           ))}
         </div>
@@ -129,9 +131,9 @@ export default async function HomePage() {
           Updates
         </p>
         <h2 className="mt-3 text-3xl font-semibold tracking-tight">Build log.</h2>
-        {updates.length ? (
+        {recentUpdates.length ? (
           <div className="mt-7 divide-y divide-[var(--border)]">
-            {updates.map((x) => (
+            {recentUpdates.map((x) => (
               <Link key={x.id} href={`/updates/${x.slug}`} className="block py-5">
                 <span className="font-medium">{x.title}</span>
                 <p className="mt-1 text-sm text-[var(--muted)]">{x.excerpt}</p>
