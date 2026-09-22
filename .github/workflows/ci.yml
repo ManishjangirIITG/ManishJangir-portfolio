@@ -82,7 +82,7 @@ jobs:
         run: npm run build
 
       - name: download playwright
-        run: npx playwright install
+        run: npx playwright install --with-deps chromium
 
       - name: End-to-end tests
         run: npm run test:e2e
