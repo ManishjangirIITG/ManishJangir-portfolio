@@ -1,7 +1,5 @@
 import Link from "next/link";
-
 import { siteConfig } from "@/config/site";
-
 export function SiteHeader() {
   return (
     <header className="border-b border-[var(--border)]">
@@ -9,7 +7,6 @@ export function SiteHeader() {
         <Link href="/" className="font-mono text-sm font-semibold tracking-tight">
           MJ<span className="text-[var(--primary)]">.</span>
         </Link>
-
         <nav aria-label="Primary navigation" className="hidden gap-5 md:flex">
           {siteConfig.navigation.map((item) => (
             <Link
@@ -21,8 +18,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-
-        <span className="font-mono text-xs text-[var(--subtle)]">foundation / 0.1.0</span>
+        <span className="font-mono text-xs text-[var(--subtle)]">portfolio / public</span>
       </div>
     </header>
   );

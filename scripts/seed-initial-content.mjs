@@ -13,6 +13,8 @@ const sql = postgres(databaseUrl, { max: 1, prepare: false });
 const projects = [
   {
     slug: "molecular-spectra-prediction-gnns",
+    startDate: "2025-08-01",
+    endDate: "2025-11-01",
     title: "Bachelor's Thesis Project I — Molecular Spectra Prediction via GNNs",
     summary:
       "Researched molecular spectra (NMR/IR) prediction from molecular topology using Graph Neural Networks, including a validated SMILES-to-graph preprocessing pipeline and a custom Message-Passing Neural Network.",
@@ -37,6 +39,8 @@ const projects = [
   },
   {
     slug: "gnn-optimization-deployment",
+    startDate: "2026-01-01",
+    endDate: "2026-03-01",
     title: "Bachelor's Thesis Project II — GNN Optimization & Deployment",
     summary:
       "Optimized a custom GNN pipeline and deployed inference through a stateless FastAPI microservice with request batching, API-edge molecular validation, and containerized delivery.",
@@ -56,6 +60,8 @@ const projects = [
   },
   {
     slug: "cryptocurrency-price-prediction",
+    startDate: "2025-08-01",
+    endDate: "2025-09-01",
     title: "Cryptocurrency Price Prediction — ML Forecasting System",
     summary:
       "Built a Bitcoin forecasting workflow using historical price and Wikipedia edit activity, feature engineering, baseline modeling, XGBoost, and backtesting.",
@@ -88,6 +94,8 @@ const projects = [
   },
   {
     slug: "ur-vdo",
+    startDate: "2025-01-01",
+    endDate: "2025-03-01",
     title: "UR VDO — Full-Stack Video Streaming Platform",
     summary:
       "Developed a full-stack video streaming platform with authentication, subscription payments, indexed social data, geolocation-aware OTP delivery, and adaptive bitrate streaming.",
@@ -140,11 +148,13 @@ async function seed() {
   await sql.begin(async (tx) => {
     for (const [sortOrder, project] of projects.entries()) {
       const [row] = await tx`
-        insert into projects (slug, title, summary, status, featured, sort_order, published_at)
-        values (${project.slug}, ${project.title}, ${project.summary}, 'published', false, ${sortOrder}, now())
+        insert into projects (slug, title, summary, status, featured, sort_order, start_date, end_date, published_at)
+        values (${project.slug}, ${project.title}, ${project.summary}, 'published', false, ${sortOrder}, ${project.startDate}, ${project.endDate}, now())
         on conflict (slug) do update set
           title = excluded.title,
           summary = excluded.summary,
+          start_date = excluded.start_date,
+          end_date = excluded.end_date,
           updated_at = now()
         returning id
       `;

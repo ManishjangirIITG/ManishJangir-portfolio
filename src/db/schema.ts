@@ -39,6 +39,8 @@ export const projects = pgTable(
     sortOrder: integer("sort_order").notNull().default(0),
     demoUrl: text("demo_url"),
     repoUrl: text("repo_url"),
+    startDate: date("start_date"),
+    endDate: date("end_date"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -46,6 +48,10 @@ export const projects = pgTable(
   (table) => [
     uniqueIndex("projects_slug_unique").on(table.slug),
     index("projects_sort_order_idx").on(table.sortOrder),
+    check(
+      "projects_date_range_check",
+      sql`${table.endDate} IS NULL OR ${table.startDate} IS NULL OR ${table.endDate} >= ${table.startDate}`,
+    ),
   ],
 );
 
