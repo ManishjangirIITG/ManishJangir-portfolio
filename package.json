@@ -19,7 +19,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "admin:hash": "node scripts/create-admin-hash.mjs",
-    "admin:seed": "node scripts/seed-admin.mjs"
+    "admin:seed": "node scripts/seed-admin.mjs",
+    "db:seed": "node scripts/seed-initial-content.mjs"
   },
   "dependencies": {
     "dotenv": "^18.0.2",
