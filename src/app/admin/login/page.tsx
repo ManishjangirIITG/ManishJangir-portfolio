@@ -10,11 +10,11 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isFilled = Boolean(email.trim() && password.trim());
+  // const isFilled = Boolean(email.trim() && password.trim());
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!isFilled) return;
+    // if (!isFilled) return;
     setError(null);
     setIsSubmitting(true);
 
@@ -89,7 +89,7 @@ export default function AdminLoginPage() {
 
           <button
             className="w-full rounded-lg border border-white/10 bg-[color-mix(in_srgb,var(--color-primary),white_15%)] px-4 py-2.5 font-medium text-[var(--color-background)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary),white_25%)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-            disabled={isSubmitting || !isFilled}
+            disabled={isSubmitting}
             type="submit"
           >
             {isSubmitting ? "Signing in..." : "Sign in"}
