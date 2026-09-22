@@ -1,39 +1,47 @@
 # Manish Jangir Portfolio
 
-Production-grade engineering portfolio. Phase 1 establishes the application foundation only.
+Production-grade engineering portfolio. Phase 2 adds the PostgreSQL persistence foundation without adding CMS or authentication behavior yet.
 
-## Phase 1 scope
+## Phase 2 scope
 
-- Next.js App Router + TypeScript
-- Strict TypeScript configuration
-- Tailwind CSS v4
-- Environment validation with Zod
-- Base public application shell
-- Initial route structure
-- Accessible focus and reduced-motion foundations
-- ESLint + Prettier
-- Vitest unit-test setup
-- Playwright E2E setup
-- Central JSON logger abstraction
-- Safe error boundary and 404 page
-- `.env.example`
+- PostgreSQL database connection through `postgres`
+- Drizzle ORM and Drizzle Kit
+- Normalized relational content schema
+- Initial database migration
+- Projects and ordered case-study sections
+- Technologies and project technology relationships
+- Experience records
+- Publishable updates
+- Draft / Published / Archived content states
+- Database-focused unit test coverage
+- Database setup and migration documentation
 
-Database, authentication, CMS, analytics, observability integrations, media storage, and project content are intentionally deferred to later phases.
+Authentication, admin CRUD, revisions, audit trails, analytics, media storage, and seeded resume content remain deferred to their corresponding phases.
 
 ## Requirements
 
 - Node.js 20.9+
 - npm 10+
+- PostgreSQL 15+
 
 ## Setup
 
 ```bash
 npm install
 cp .env.example .env.local
-npm run dev
 ```
 
-Open `http://localhost:3000`.
+Set `DATABASE_URL` in `.env.local`, then apply the committed migration:
+
+```bash
+npm run db:migrate
+```
+
+Start the application:
+
+```bash
+npm run dev
+```
 
 ## Quality checks
 
@@ -46,6 +54,13 @@ npm run build
 npm run test:e2e
 ```
 
-## Architecture
+## Database workflow
 
-Phase 0 architecture is recorded in `docs/architecture.md`. The Phase 1 implementation deliberately avoids adding database, auth, Redis, or external telemetry dependencies before their corresponding phases.
+Edit `src/db/schema.ts`, generate a migration, review the SQL, and then apply it:
+
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+See `docs/database.md` for the Phase 2 model and boundaries.

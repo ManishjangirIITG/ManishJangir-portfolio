@@ -11,13 +11,19 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:check": "drizzle-kit check",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "dotenv": "^18.0.2",
+    "drizzle-orm": "^0.45.3",
     "next": "^16.3.5",
+    "postgres": "3.4.7",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "zod": "4.1.5"
@@ -28,6 +34,7 @@
     "@types/node": "24.3.0",
     "@types/react": "19.1.12",
     "@types/react-dom": "19.1.9",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^8.57.1",
     "eslint-config-next": "15.5.2",
     "prettier": "3.6.2",
