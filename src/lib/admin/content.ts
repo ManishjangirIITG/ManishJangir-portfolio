@@ -87,15 +87,13 @@ export async function recordRevision(
     .where(
       and(eq(contentRevisions.entityType, entityType), eq(contentRevisions.entityId, entityId)),
     );
-  await db
-    .insert(contentRevisions)
-    .values({
-      entityType,
-      entityId,
-      revisionNumber: (current?.value ?? 0) + 1,
-      snapshot,
-      createdBy: actorId,
-    });
+  await db.insert(contentRevisions).values({
+    entityType,
+    entityId,
+    revisionNumber: (current?.value ?? 0) + 1,
+    snapshot,
+    createdBy: actorId,
+  });
 }
 
 export async function recordAudit(
