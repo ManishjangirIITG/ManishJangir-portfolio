@@ -24,9 +24,8 @@ jobs:
           --health-retries 5
 
     env:
-      NODE_ENV: test
       DATABASE_URL: postgresql://ci:ci_test_password@localhost:5432/portfolio_ci
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
       NEXT_PUBLIC_APP_NAME: Manish Jangir Portfolio
       CI_ADMIN_EMAIL: ci-admin@example.test
 
@@ -43,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: download playwright
+      - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
       - name: Apply database migrations
@@ -52,22 +51,16 @@ jobs:
       - name: Provision CI admin
         shell: bash
         run: |
-          set -euo pipefail
-
           CI_PASSWORD="$(openssl rand -hex 24)"
           HASH="$(node scripts/create-admin-hash.mjs "$CI_PASSWORD" | sed 's/^ADMIN_PASSWORD_HASH=//')"
-
           echo "::add-mask::$CI_PASSWORD"
           echo "::add-mask::$HASH"
-
           export ADMIN_EMAIL="$CI_ADMIN_EMAIL"
           export CI_ADMIN_PASSWORD="$CI_PASSWORD"
           export ADMIN_PASSWORD_HASH="$HASH"
-
           echo "ADMIN_EMAIL=$ADMIN_EMAIL" >> "$GITHUB_ENV"
           echo "CI_ADMIN_PASSWORD=$CI_ADMIN_PASSWORD" >> "$GITHUB_ENV"
           echo "ADMIN_PASSWORD_HASH=$ADMIN_PASSWORD_HASH" >> "$GITHUB_ENV"
-
           npm run admin:seed
 
       - name: Typecheck
@@ -85,5 +78,16 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: End-to-end tests
+      - name: End-to-end and accessibility tests
         run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
