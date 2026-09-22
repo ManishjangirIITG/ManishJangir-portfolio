@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -10,7 +11,6 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
 
 export const contentStatus = pgEnum("content_status", ["draft", "published", "archived"]);
 
@@ -124,6 +124,38 @@ export const updates = pgTable(
   (table) => [uniqueIndex("updates_slug_unique").on(table.slug)],
 );
 
+export const adminUsers = pgTable(
+  "admin_users",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: text("email").notNull(),
+    passwordHash: text("password_hash").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+  },
+  (table) => [uniqueIndex("admin_users_email_unique").on(table.email)],
+);
+
+export const adminSessions = pgTable(
+  "admin_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("admin_sessions_token_hash_unique").on(table.tokenHash),
+    uniqueIndex("admin_sessions_user_id_unique").on(table.userId),
+  ],
+);
+
 export const projectsRelations = relations(projects, ({ many }) => ({
   sections: many(projectSections),
   technologies: many(projectTechnologies),
@@ -148,5 +180,16 @@ export const projectTechnologiesRelations = relations(projectTechnologies, ({ on
   technology: one(technologies, {
     fields: [projectTechnologies.technologyId],
     references: [technologies.id],
+  }),
+}));
+
+export const adminUsersRelations = relations(adminUsers, ({ many }) => ({
+  sessions: many(adminSessions),
+}));
+
+export const adminSessionsRelations = relations(adminSessions, ({ one }) => ({
+  user: one(adminUsers, {
+    fields: [adminSessions.userId],
+    references: [adminUsers.id],
   }),
 }));

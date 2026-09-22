@@ -17,7 +17,9 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "admin:hash": "node scripts/create-admin-hash.mjs",
+    "admin:seed": "node scripts/seed-admin.mjs"
   },
   "dependencies": {
     "dotenv": "^18.0.2",

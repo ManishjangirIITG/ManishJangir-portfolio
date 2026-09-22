@@ -1,31 +1,74 @@
 name: CI
 
 on:
-  pull_request:
   push:
-    branches: [main]
+  pull_request:
 
 jobs:
   quality:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci_test_password
+          POSTGRES_DB: portfolio_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d portfolio_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
-      NODE_ENV: test
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      DATABASE_URL: postgresql://ci:ci_test_password@localhost:5432/portfolio_ci
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
       NEXT_PUBLIC_APP_NAME: Manish Jangir Portfolio
-      DATABASE_URL: postgresql://test:test@localhost:5432/test
+      CI_ADMIN_EMAIL: ci-admin@example.test
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run test
-      - run: npm run format:check
-      - run: npm run build
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply database migrations
+        run: npm run db:migrate
+
+      - name: Provision CI admin
+        shell: bash
+        run: |
+          CI_PASSWORD="$(openssl rand -hex 24)"
+          HASH="$(node scripts/create-admin-hash.mjs "$CI_PASSWORD" | sed 's/^ADMIN_PASSWORD_HASH=//')"
+          echo "ADMIN_EMAIL=$CI_ADMIN_EMAIL" >> "$GITHUB_ENV"
+          echo "CI_ADMIN_PASSWORD=$CI_PASSWORD" >> "$GITHUB_ENV"
+          echo "ADMIN_PASSWORD_HASH=$HASH" >> "$GITHUB_ENV"
+          npm run admin:seed
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Build
+        run: npm run build
+
+      - name: End-to-end tests
+        run: npm run test:e2e

@@ -1,22 +1,21 @@
 # Manish Jangir Portfolio
 
-Production-grade engineering portfolio. Phase 2 adds the PostgreSQL persistence foundation without adding CMS or authentication behavior yet.
+Production-grade engineering portfolio. Phase 3 adds the private administration authentication boundary on top of the Phase 2 PostgreSQL content foundation.
 
-## Phase 2 scope
+## Phase 3 scope
 
-- PostgreSQL database connection through `postgres`
-- Drizzle ORM and Drizzle Kit
-- Normalized relational content schema
-- Initial database migration
-- Projects and ordered case-study sections
-- Technologies and project technology relationships
-- Experience records
-- Publishable updates
-- Draft / Published / Archived content states
-- Database-focused unit test coverage
-- Database setup and migration documentation
+- Database-backed administrator identity
+- PBKDF2 password hashing
+- Opaque, hashed session tokens
+- HTTP-only secure session cookie
+- Server-side admin authorization
+- Protected `/admin` route
+- Private `/admin/login` route
+- Login and logout API boundaries
+- Local administrator provisioning workflow
+- Authentication-focused tests and documentation
 
-Authentication, admin CRUD, revisions, audit trails, analytics, media storage, and seeded resume content remain deferred to their corresponding phases.
+Content CRUD, revisions, audit trails, analytics, media storage, and public database-backed content remain deferred to later phases.
 
 ## Requirements
 
@@ -31,10 +30,22 @@ npm install
 cp .env.example .env.local
 ```
 
-Set `DATABASE_URL` in `.env.local`, then apply the committed migration:
+Set `DATABASE_URL` in `.env.local`, then apply the committed migrations:
 
 ```bash
 npm run db:migrate
+```
+
+Generate a password hash locally:
+
+```bash
+npm run admin:hash -- '<strong-password>'
+```
+
+Set the resulting `ADMIN_PASSWORD_HASH` and `ADMIN_EMAIL` in the environment used to provision the administrator, then run:
+
+```bash
+npm run admin:seed
 ```
 
 Start the application:
@@ -42,6 +53,8 @@ Start the application:
 ```bash
 npm run dev
 ```
+
+Open `/admin/login` to authenticate.
 
 ## Quality checks
 
@@ -54,13 +67,4 @@ npm run build
 npm run test:e2e
 ```
 
-## Database workflow
-
-Edit `src/db/schema.ts`, generate a migration, review the SQL, and then apply it:
-
-```bash
-npm run db:generate
-npm run db:migrate
-```
-
-See `docs/database.md` for the Phase 2 model and boundaries.
+See `docs/authentication.md` for the session and password model.
