@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 
 import { PageViewTracker } from "@/components/analytics/page-view-tracker";
 
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <PageViewTracker />
         <SiteShell>{children}</SiteShell>
+        <Analytics />
       </body>
     </html>
   );
