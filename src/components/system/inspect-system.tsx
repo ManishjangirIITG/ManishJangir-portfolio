@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useReportWebVitals } from "next/web-vitals";
 import type { PublicEnvironment } from "@/lib/system/info";
 
@@ -41,10 +41,22 @@ export function InspectSystem({ version, gitSha, environment }: InspectSystemPro
   const [database, setDatabase] = useState<CheckState>("checking");
   const [vitals, setVitals] = useState<VitalSnapshot>({});
 
-  useReportWebVitals((metric) => {
-    if (!isVitalName(metric.name)) return;
-    setVitals((current) => ({ ...current, [metric.name]: metric.value }));
-  });
+  const handleWebVital = useCallback((metric: { name: string; value: number }) => {
+    const name = metric.name;
+
+    if (!isVitalName(name)) return;
+
+    setVitals((current) => {
+      if (current[name] === metric.value) return current;
+
+      return {
+        ...current,
+        [name]: metric.value,
+      };
+    });
+  }, []);
+
+  useReportWebVitals(handleWebVital);
 
   useEffect(() => {
     let active = true;

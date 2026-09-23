@@ -1,0 +1,29 @@
+--- a/src/components/system/inspect-system.tsx
++++ b/src/components/system/inspect-system.tsx
+@@ -1,6 +1,6 @@
+ "use client";
+ 
+-import { useEffect, useState } from "react";
++import { useCallback, useEffect, useState } from "react";
+ import { useReportWebVitals } from "next/web-vitals";
+ import type { PublicEnvironment } from "@/lib/system/info";
+ 
+@@ -31,9 +31,15 @@
+   const [database, setDatabase] = useState<CheckState>("checking");
+   const [vitals, setVitals] = useState<VitalSnapshot>({});
+ 
+-  useReportWebVitals((metric) => {
++  const handleWebVital = useCallback<Parameters<typeof useReportWebVitals>[0]>((metric) => {
+     if (!isVitalName(metric.name)) return;
+-    setVitals((current) => ({ ...current, [metric.name]: metric.value }));
+-  });
++
++    setVitals((current) => {
++      if (current[metric.name] === metric.value) return current;
++      return { ...current, [metric.name]: metric.value };
++    });
++  }, []);
++
++  useReportWebVitals(handleWebVital);
+ 
+   useEffect(() => {
