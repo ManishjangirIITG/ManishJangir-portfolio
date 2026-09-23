@@ -123,11 +123,7 @@ export default async function HomePage() {
               </div>
             </div>
           ))}
-          <Link
-            href="/experience"
-            className="mt-7 inline-block text-sm text-[var(--primary)]"
-            prefetch={false}
-          >
+          <Link href="/experience" className="mt-7 inline-block text-sm text-[var(--primary)]" prefetch={false}>
             Full experience →
           </Link>
         </div>

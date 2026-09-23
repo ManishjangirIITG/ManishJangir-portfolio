@@ -24,11 +24,7 @@ export default async function UpdatesPage() {
               })}
             </p>
             <h2 className="mt-2 text-xl font-semibold">
-              <Link
-                href={`/updates/${item.slug}`}
-                className="hover:text-[var(--primary)]"
-                prefetch={false}
-              >
+              <Link href={`/updates/${item.slug}`} className="hover:text-[var(--primary)]" prefetch={false}>
                 {item.title}
               </Link>
             </h2>
