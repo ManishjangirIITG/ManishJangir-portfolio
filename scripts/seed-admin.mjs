@@ -1,5 +1,5 @@
 try {
-  process.loadEnvFile(".env.local");
+  process.loadEnvFile(".env");
 } catch {
   // Environment variables may already be supplied by the shell or CI.
 }
