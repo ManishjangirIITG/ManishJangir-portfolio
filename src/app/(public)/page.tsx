@@ -38,12 +38,14 @@ export default async function HomePage() {
             <Link
               href="/projects"
               className="border border-[var(--primary)] px-4 py-2.5 text-sm font-medium text-[var(--primary)] hover:bg-[var(--primary)] hover:text-black"
+              prefetch={false}
             >
               View work
             </Link>
             <Link
               href="/resume"
               className="border border-[var(--border)] px-4 py-2.5 text-sm font-medium hover:border-[var(--muted)]"
+              prefetch={false}
             >
               Resume
             </Link>
@@ -91,7 +93,7 @@ export default async function HomePage() {
               Systems, not screenshots.
             </h2>
           </div>
-          <Link href="/projects" className="text-sm text-[var(--primary)]">
+          <Link href="/projects" className="text-sm text-[var(--primary)]" prefetch={false}>
             All projects →
           </Link>
         </div>
@@ -121,7 +123,11 @@ export default async function HomePage() {
               </div>
             </div>
           ))}
-          <Link href="/experience" className="mt-7 inline-block text-sm text-[var(--primary)]">
+          <Link
+            href="/experience"
+            className="mt-7 inline-block text-sm text-[var(--primary)]"
+            prefetch={false}
+          >
             Full experience →
           </Link>
         </div>
@@ -134,7 +140,7 @@ export default async function HomePage() {
         {recentUpdates.length ? (
           <div className="mt-7 divide-y divide-[var(--border)]">
             {recentUpdates.map((x) => (
-              <Link key={x.id} href={`/updates/${x.slug}`} className="block py-5">
+              <Link key={x.id} href={`/updates/${x.slug}`} className="block py-5" prefetch={false}>
                 <span className="font-medium">{x.title}</span>
                 <p className="mt-1 text-sm text-[var(--muted)]">{x.excerpt}</p>
               </Link>
@@ -153,6 +159,7 @@ export default async function HomePage() {
           <Link
             href="/contact"
             className="mt-6 inline-block border border-[var(--primary)] px-4 py-2.5 text-sm text-[var(--primary)]"
+            prefetch={false}
           >
             Contact
           </Link>

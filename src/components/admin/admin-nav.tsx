@@ -17,6 +17,7 @@ export function AdminNav() {
           key={item.href}
           href={item.href}
           className="rounded-lg border border-white/10 px-3 py-2 text-[var(--color-muted)] hover:text-white"
+          prefetch={false}
         >
           {item.label}
         </Link>

@@ -9,6 +9,7 @@ export default function NotFound() {
       <Link
         href="/"
         className="mt-8 w-fit border border-[var(--border)] px-4 py-2.5 text-sm hover:border-[var(--muted)]"
+        prefetch={false}
       >
         Return home
       </Link>

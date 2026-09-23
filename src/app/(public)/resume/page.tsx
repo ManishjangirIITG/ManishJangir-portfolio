@@ -229,6 +229,7 @@ export default function ResumePage() {
             <Link
               href="/projects"
               className="border border-[var(--primary)] px-4 py-2.5 text-sm font-medium text-[var(--primary)] hover:bg-[var(--primary)] hover:text-black"
+              prefetch={false}
             >
               View projects
             </Link>

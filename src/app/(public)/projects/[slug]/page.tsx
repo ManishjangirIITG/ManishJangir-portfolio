@@ -26,6 +26,7 @@ export default async function ProjectPage({ params }: Props) {
         <Link
           href="/projects"
           className="font-mono text-xs text-[var(--muted)] hover:text-[var(--primary)]"
+          prefetch={false}
         >
           ← all projects
         </Link>

@@ -126,6 +126,7 @@ export default function ContactPage() {
             <Link
               href="/projects"
               className="mt-6 inline-block text-sm font-medium text-[var(--primary)]"
+              prefetch={false}
             >
               Explore projects →
             </Link>

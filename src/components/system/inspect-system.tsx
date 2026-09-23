@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useReportWebVitals } from "next/web-vitals";
 import type { PublicEnvironment } from "@/lib/system/info";
 
@@ -26,30 +26,50 @@ function formatVital(name: VitalName, value: number): string {
   return `${Math.round(value)} ms`;
 }
 
+async function checkEndpoint(url: string): Promise<boolean> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    await response.text();
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 export function InspectSystem({ version, gitSha, environment }: InspectSystemProps) {
   const [api, setApi] = useState<CheckState>("checking");
   const [database, setDatabase] = useState<CheckState>("checking");
   const [vitals, setVitals] = useState<VitalSnapshot>({});
 
-  useReportWebVitals((metric) => {
-    if (!isVitalName(metric.name)) return;
-    setVitals((current) => ({ ...current, [metric.name]: metric.value }));
-  });
+  const handleWebVital = useCallback((metric: { name: string; value: number }) => {
+    const name = metric.name;
+
+    if (!isVitalName(name)) return;
+
+    setVitals((current) => {
+      if (current[name] === metric.value) return current;
+
+      return {
+        ...current,
+        [name]: metric.value,
+      };
+    });
+  }, []);
+
+  useReportWebVitals(handleWebVital);
 
   useEffect(() => {
     let active = true;
 
     async function inspect() {
-      const [healthResult, readinessResult] = await Promise.allSettled([
-        fetch("/api/health", { cache: "no-store" }),
-        fetch("/api/health/ready", { cache: "no-store" }),
+      const [apiOk, databaseOk] = await Promise.all([
+        checkEndpoint("/api/health"),
+        checkEndpoint("/api/health/ready"),
       ]);
 
       if (!active) return;
-      setApi(healthResult.status === "fulfilled" && healthResult.value.ok ? "ok" : "unavailable");
-      setDatabase(
-        readinessResult.status === "fulfilled" && readinessResult.value.ok ? "ok" : "unavailable",
-      );
+      setApi(apiOk ? "ok" : "unavailable");
+      setDatabase(databaseOk ? "ok" : "unavailable");
     }
 
     void inspect();

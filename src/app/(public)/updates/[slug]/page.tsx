@@ -12,7 +12,7 @@ export default async function UpdatePage({ params }: Props) {
   if (!item) notFound();
   return (
     <article className="mx-auto max-w-3xl px-5 py-20 sm:px-6 lg:px-8">
-      <Link href="/updates" className="font-mono text-xs text-[var(--muted)]">
+      <Link href="/updates" className="font-mono text-xs text-[var(--muted)]" prefetch={false}>
         ← updates
       </Link>
       <h1 className="mt-8 text-4xl font-semibold tracking-tight">{item.title}</h1>

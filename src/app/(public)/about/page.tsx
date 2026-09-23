@@ -150,12 +150,14 @@ export default function AboutPage() {
             <Link
               href="/projects"
               className="border border-[var(--primary)] px-4 py-2.5 text-sm font-medium text-[var(--primary)] hover:bg-[var(--primary)] hover:text-black"
+              prefetch={false}
             >
               Explore projects
             </Link>
             <Link
               href="/resume"
               className="border border-[var(--border)] px-4 py-2.5 text-sm font-medium hover:border-[var(--muted)]"
+              prefetch={false}
             >
               View resume
             </Link>
