@@ -1,7 +1,3 @@
-"use client";
-
-import { useState } from "react";
-
 const stages = [
   {
     id: "chemical-science",
@@ -33,12 +29,7 @@ const stages = [
   },
 ] as const;
 
-type StageId = (typeof stages)[number]["id"];
-
 export function EngineeringSystemMap() {
-  const [activeId, setActiveId] = useState<StageId>(stages[0].id);
-  const activeStage = stages.find((stage) => stage.id === activeId) ?? stages[0];
-
   return (
     <section className="border-y border-[var(--border)]" aria-labelledby="system-map-title">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
@@ -50,41 +41,35 @@ export function EngineeringSystemMap() {
             One path, increasingly closer to production.
           </h2>
           <p className="mt-3 leading-7 text-[var(--muted)]">
-            Select a stage to inspect how the work progressed from domain knowledge to models,
+            Open a stage to inspect how the work progressed from domain knowledge to models,
             services, and infrastructure.
           </p>
         </div>
 
-        <div className="mt-9 grid gap-6 lg:grid-cols-[1fr_360px]">
-          <div className="relative grid gap-px bg-[var(--border)] sm:grid-cols-2 lg:grid-cols-4">
-            {stages.map((stage) => {
-              const isActive = stage.id === activeStage.id;
-              return (
-                <button
-                  key={stage.id}
-                  type="button"
-                  aria-pressed={isActive}
-                  onClick={() => setActiveId(stage.id)}
-                  className={`min-h-36 bg-[var(--background)] p-5 text-left transition-colors hover:bg-[var(--surface)] ${
-                    isActive ? "shadow-[inset_0_-2px_0_var(--primary)]" : ""
-                  }`}
-                >
+        <div className="mt-9 grid gap-px bg-[var(--border)] sm:grid-cols-2 lg:grid-cols-4">
+          {stages.map((stage, index) => (
+            <details key={stage.id} open={index === 0} className="group bg-[var(--background)]">
+              <summary className="min-h-36 cursor-pointer list-none p-5 text-left transition-colors hover:bg-[var(--surface)] [&::-webkit-details-marker]:hidden">
+                <span className="flex items-center justify-between gap-3">
                   <span className="font-mono text-xs text-[var(--subtle)]">{stage.index}</span>
                   <span
-                    className={`mt-8 block font-medium ${isActive ? "text-[var(--primary)]" : ""}`}
+                    aria-hidden="true"
+                    className="font-mono text-xs text-[var(--subtle)] group-open:text-[var(--primary)]"
                   >
-                    {stage.label}
+                    +
                   </span>
-                </button>
-              );
-            })}
-          </div>
+                </span>
+                <span className="mt-8 block font-medium group-open:text-[var(--primary)]">
+                  {stage.label}
+                </span>
+              </summary>
 
-          <div className="border border-[var(--border)] bg-[var(--surface)] p-6" aria-live="polite">
-            <p className="font-mono text-xs text-[var(--primary)]">ACTIVE / {activeStage.index}</p>
-            <h3 className="mt-4 text-xl font-semibold">{activeStage.label}</h3>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{activeStage.detail}</p>
-          </div>
+              <div className="border-t border-[var(--border)] bg-[var(--surface)] p-5">
+                <p className="font-mono text-xs text-[var(--primary)]">STAGE / {stage.index}</p>
+                <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{stage.detail}</p>
+              </div>
+            </details>
+          ))}
         </div>
       </div>
     </section>
