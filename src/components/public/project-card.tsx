@@ -23,7 +23,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
         {range ? <span className="font-mono text-xs text-[var(--subtle)]">{range}</span> : null}
       </div>
       <h2 className="mt-4 text-xl font-semibold tracking-tight">
-        <Link href={`/projects/${project.slug}`} className="group-hover:text-[var(--primary)]" prefetch={false}>
+        <Link
+          href={`/projects/${project.slug}`}
+          className="group-hover:text-[var(--primary)]"
+          prefetch={false}
+        >
           {project.title}
         </Link>
       </h2>
