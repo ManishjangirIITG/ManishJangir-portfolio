@@ -12,6 +12,7 @@ export default async function Page() {
       <Link
         href="/admin/experience/new"
         className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-background)]"
+        prefetch={false}
       >
         New experience
       </Link>
@@ -21,6 +22,7 @@ export default async function Page() {
             key={x.id}
             href={`/admin/experience/${x.id}`}
             className="rounded-xl border border-white/10 p-4"
+            prefetch={false}
           >
             <div className="flex justify-between">
               <span>

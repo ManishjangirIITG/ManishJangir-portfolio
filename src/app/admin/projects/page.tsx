@@ -12,6 +12,7 @@ export default async function Page() {
       <Link
         href="/admin/projects/new"
         className="rounded-lg border-white/10 bg-[color-mix(in_srgb,var(--color-primary),white_15%)] px-4 py-2 text-sm font-medium text-[var(--color-background)]"
+        prefetch={false}
       >
         New project
       </Link>
@@ -21,6 +22,7 @@ export default async function Page() {
             key={x.id}
             href={`/admin/projects/${x.id}`}
             className="rounded-xl border border-white/10 p-4 hover:border-white/20"
+            prefetch={false}
           >
             <div className="flex justify-between gap-4">
               <span className="font-medium">{x.title}</span>
