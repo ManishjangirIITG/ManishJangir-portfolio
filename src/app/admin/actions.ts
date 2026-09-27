@@ -34,6 +34,7 @@ function actionFor(oldStatus: string | undefined, newStatus: string) {
 }
 
 export async function saveProject(fd: FormData) {
+  let previousSlug: string | null = null;
   const admin = await requireAdminSession();
   const id = text(fd, "id");
   const input = projectInput.parse({
@@ -55,6 +56,13 @@ export async function saveProject(fd: FormData) {
   if (id) {
     const before = await getEntity("project", id);
     if (!before) throw new Error("Project not found");
+
+    if ("slug" in before) {
+      previousSlug = before.slug;
+    } else {
+      previousSlug = null;
+    }
+
     await recordRevision("project", id, before, admin.id);
     await db.update(projects).set(values).where(eq(projects.id, id));
     await recordAudit(admin.id, actionFor(before.status, input.status), "project", id);
@@ -70,6 +78,14 @@ export async function saveProject(fd: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/projects");
+  revalidatePath("/");
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${input.slug}`);
+
+  if (previousSlug && previousSlug !== input.slug) {
+    revalidatePath(`/projects/${previousSlug}`);
+  }
+
   redirect("/admin/projects");
 }
 
@@ -93,6 +109,7 @@ export async function saveExperience(fd: FormData) {
   if (id) {
     const before = await getEntity("experience", id);
     if (!before) throw new Error("Experience not found");
+
     await recordRevision("experience", id, before, admin.id);
     await db.update(experiences).set(values).where(eq(experiences.id, id));
     await recordAudit(admin.id, actionFor(before.status, input.status), "experience", id);
@@ -108,10 +125,13 @@ export async function saveExperience(fd: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/experience");
+  revalidatePath("/");
+  revalidatePath("/experience");
   redirect("/admin/experience");
 }
 
 export async function saveUpdate(fd: FormData) {
+  let previousSlug: string | null = null;
   const admin = await requireAdminSession();
   const id = text(fd, "id");
   const input = updateInput.parse({
@@ -131,6 +151,13 @@ export async function saveUpdate(fd: FormData) {
   if (id) {
     const before = await getEntity("update", id);
     if (!before) throw new Error("Update not found");
+
+    if ("slug" in before) {
+      previousSlug = before.slug;
+    } else {
+      previousSlug = null;
+    }
+
     await recordRevision("update", id, before, admin.id);
     await db.update(updates).set(values).where(eq(updates.id, id));
     await recordAudit(admin.id, actionFor(before.status, input.status), "update", id);
@@ -142,6 +169,15 @@ export async function saveUpdate(fd: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/updates");
+
+  revalidatePath("/");
+  revalidatePath("/updates");
+  revalidatePath(`/updates/${input.slug}`);
+
+  if (previousSlug && previousSlug !== input.slug) {
+    revalidatePath(`/updates/${previousSlug}`);
+  }
+
   redirect("/admin/updates");
 }
 
@@ -155,10 +191,18 @@ export async function deleteContent(fd: FormData) {
   await recordRevision(type, id, before, admin.id);
   await recordAudit(admin.id, "delete", type, id);
 
-  if (type === "project") await db.delete(projects).where(eq(projects.id, id));
-  else if (type === "experience") await db.delete(experiences).where(eq(experiences.id, id));
-  else await db.delete(updates).where(eq(updates.id, id));
+  if (type === "project") {
+    await db.delete(projects).where(eq(projects.id, id));
+    revalidatePath("/projects");
+  } else if (type === "experience") {
+    await db.delete(experiences).where(eq(experiences.id, id));
+    revalidatePath("/experience");
+  } else {
+    await db.delete(updates).where(eq(updates.id, id));
+    revalidatePath("/updates");
+  }
 
+  revalidatePath("/");
   revalidatePath("/admin");
   redirect(type === "experience" ? "/admin/experience" : `/admin/${type}s`);
 }
